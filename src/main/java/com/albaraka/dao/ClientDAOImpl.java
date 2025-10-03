@@ -18,9 +18,9 @@ public class ClientDAOImpl implements ClientDAO {
 
     @Override
     public Client save(Client client) {
-        String sql = "INSERT INTO clients (nom, email) VALUES (?, ?)";
+        String sql = "INSERT INTO client (nom, email) VALUES (?, ?)";
         try (Connection conn = dbManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, client.nom());
             pstmt.setString(2, client.email());
             int affectedRows = pstmt.executeUpdate();
@@ -42,7 +42,7 @@ public class ClientDAOImpl implements ClientDAO {
 
     @Override
     public Optional<Client> findById(int id) {
-        String sql = "SELECT * FROM clients WHERE id = ?";
+        String sql = "SELECT * FROM client WHERE id = ?";
         try (Connection conn = dbManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
@@ -59,7 +59,7 @@ public class ClientDAOImpl implements ClientDAO {
 
     @Override
     public List<Client> findAll() {
-        String sql = "SELECT * FROM clients";
+        String sql = "SELECT * FROM client";
         List<Client> clients = new ArrayList<>();
         try (Connection conn = dbManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -76,7 +76,7 @@ public class ClientDAOImpl implements ClientDAO {
 
     @Override
     public Client update(Client client) {
-        String sql = "UPDATE clients SET nom = ?, email = ? WHERE id = ?";
+        String sql = "UPDATE client SET nom = ?, email = ? WHERE id = ?";
         try (Connection conn = dbManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, client.nom());
@@ -94,17 +94,16 @@ public class ClientDAOImpl implements ClientDAO {
     }
 
     @Override
-    public void deleteById(int id) {
-        String sql = "DELETE FROM clients WHERE id = ?";
+    public boolean delete(int id) {
+        String sql = "DELETE FROM client WHERE id = ?";
         try (Connection conn = dbManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             int affectedRows = pstmt.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Deleting client failed, no rows affected.");
-            }
+            return affectedRows > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 }
