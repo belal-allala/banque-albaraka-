@@ -1,7 +1,8 @@
 package com.albaraka.entities;
 
-
 import java.math.BigDecimal;
+
+// import java.math.Double;
 
 public sealed abstract class Compte permits CompteCourant, CompteEpargne {
 
@@ -32,5 +33,23 @@ public sealed abstract class Compte permits CompteCourant, CompteEpargne {
 
     public int getIdClient() {
         return idClient;
+    }
+
+    public void setSolde(BigDecimal solde) {
+        this.solde = solde;
+    }   
+
+    public void setIdClient(int idClient) {
+        this.idClient = idClient;
+    }
+
+    @Override
+    public String toString() {
+        return "Compte{" +
+                "id=" + id +
+                ", numero='" + numero + '\'' +
+                ", solde=" + solde +
+                ", idClient=" + idClient +
+                '}';
     }
 }
