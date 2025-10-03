@@ -1,6 +1,5 @@
 package com.albaraka.entities;
 
-
 import java.math.BigDecimal;
 
 public final class CompteCourant extends Compte {
