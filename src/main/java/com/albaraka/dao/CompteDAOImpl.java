@@ -5,7 +5,7 @@ import com.albaraka.entities.CompteCourant;
 import com.albaraka.entities.CompteEpargne;
 import com.albaraka.utils.DatabaseManager;
 
-// import java.math.BigDecimal;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,17 +21,17 @@ public class CompteDAOImpl implements CompteDAO {
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, compte.getNumero());
-            pstmt.setDouble(2, compte.getSolde());
+            pstmt.setBigDecimal(2, compte.getSolde());
             pstmt.setInt(3, compte.getIdClient());
 
             if (compte instanceof CompteCourant cc) {
                 pstmt.setString(4, "COURANT");
-                pstmt.setDouble(5, cc.getDecouvertAutorise());
+                pstmt.setBigDecimal(5, cc.getDecouvertAutorise());
                 pstmt.setNull(6, Types.DECIMAL);
             } else if (compte instanceof CompteEpargne ce) {
                 pstmt.setString(4, "EPARGNE");
-                pstmt.setNull(5, Types.DECIMAL); 
-                pstmt.setDouble(6, ce.getTauxInteret());
+                pstmt.setNull(5, Types.DECIMAL);
+                pstmt.setBigDecimal(6, ce.getTauxInteret());
             }
 
             pstmt.executeUpdate();
@@ -102,13 +102,12 @@ public class CompteDAOImpl implements CompteDAO {
         return comptes;
     }
 
-
     @Override
     public Compte update(Compte compte) {
         String sql = "UPDATE Compte SET solde = ? WHERE id = ?";
          try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-             pstmt.setDouble(1, compte.getSolde());
+             pstmt.setBigDecimal(1, compte.getSolde());
              pstmt.setInt(2, compte.getId());
              pstmt.executeUpdate();
          } catch (SQLException e) {
@@ -132,15 +131,15 @@ public class CompteDAOImpl implements CompteDAO {
     private Compte fromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String numero = rs.getString("numero");
-        Double solde = rs.getDouble("solde");
+        BigDecimal solde = rs.getBigDecimal("solde");
         int idClient = rs.getInt("idClient");
         String typeCompte = rs.getString("typeCompte");
 
         if ("COURANT".equalsIgnoreCase(typeCompte)) {
-            Double decouvert = rs.getDouble("decouvertAutorise");
+            BigDecimal decouvert = rs.getBigDecimal("decouvertAutorise");
             return new CompteCourant(id, numero, solde, idClient, decouvert);
         } else if ("EPARGNE".equalsIgnoreCase(typeCompte)) {
-            Double taux = rs.getDouble("tauxInteret");
+            BigDecimal taux = rs.getBigDecimal("tauxInteret");
             return new CompteEpargne(id, numero, solde, idClient, taux);
         } else {
             throw new IllegalStateException("Type de compte inconnu dans la base de données: " + typeCompte);
